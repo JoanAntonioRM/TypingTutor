@@ -4,7 +4,7 @@
 }
 
 .key.pressed {
-    -fx-background-color: #2563eb;
+    -fx-background-color: grey;
     -fx-text-fill: white;
 }
 
