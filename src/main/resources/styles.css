@@ -12,3 +12,11 @@
     -fx-text-inner-color: red;
     -fx-font-weight: bold;
 }
+
+.correct-label {
+    -fx-text-fill: green;
+}
+
+.incorrect-label {
+    -fx-text-fill: red;
+}
