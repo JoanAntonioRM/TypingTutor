@@ -1,6 +1,8 @@
 package com.mycompany.typingtutor;
 
 
+import java.util.HashMap;
+import java.util.Map;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -8,6 +10,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -30,6 +34,10 @@ public class App extends Application {
     private TextField promptTextField;
     private TextField inputTextField;
     private Label progressLabel;
+    
+    private final Map<KeyCode, Button> keys = new HashMap<>();
+    private Button leftShift;
+    private Button rightShift;
     
     @Override
     public void start(Stage stage) {
@@ -61,13 +69,19 @@ public class App extends Application {
         hbox.setAlignment(Pos.CENTER_LEFT);
         hbox.getChildren().addAll(progressLabel, nextButton, resetButton);
         
-        VBox root = new VBox(8);
-        root.setPadding(new Insets(16));
-        root.getChildren().addAll(promptLabel, promptTextField, inputLabel, hbox);
+        VBox topBox = new VBox(8);
+        topBox.setPadding(new Insets(16));
+        topBox.getChildren().addAll(promptLabel, promptTextField, inputLabel, inputTextField, hbox);
+        
+        VBox keyboard = buildKeyboard();
+        
+        BorderPane rootNode = new BorderPane();
+        rootNode.setTop(topBox);
+        rootNode.setCenter(keyboard);
         
         loadCurrentPrompt();
         
-        Scene scene = new Scene(root, 1280, 720);
+        Scene scene = new Scene(rootNode, 1280, 720);
         stage.setTitle("Typing Tutor");
         stage.setScene(scene);
         stage.show();
@@ -91,6 +105,75 @@ public class App extends Application {
         inputTextField.clear();
         progressLabel.setText((currentIndex + 1) + " of " + sentences.length);
         inputTextField.requestFocus();
+    }
+    
+    private VBox buildKeyboard() {
+        VBox keyboard = new VBox(6);
+        keyboard.setAlignment(Pos.CENTER);
+        keyboard.setPadding(new Insets(12));
+        
+        leftShift = makeButton("Shift", 80);
+        rightShift = makeButton("Shift", 80);
+        
+        HBox row1 = new HBox(6);
+        row1.setAlignment(Pos.CENTER);
+        row1.getChildren().addAll(
+                key("1", KeyCode.DIGIT1), key("2", KeyCode.DIGIT2),
+                key("3", KeyCode.DIGIT3), key("4", KeyCode.DIGIT4),
+                key("5", KeyCode.DIGIT5), key("6", KeyCode.DIGIT6),
+                key("7", KeyCode.DIGIT7), key("8", KeyCode.DIGIT8),
+                key("9", KeyCode.DIGIT9), key("0", KeyCode.DIGIT0),
+                keyWide("Backspace", KeyCode.BACK_SPACE, 90));
+        
+        HBox row2 = new HBox(6);
+        row2.setAlignment(Pos.CENTER);
+        row2.getChildren().addAll(
+                key("Q", KeyCode.Q), key("W", KeyCode.W), key("E", KeyCode.E),
+                key("R", KeyCode.R), key("T", KeyCode.T), key("Y", KeyCode.Y),
+                key("U", KeyCode.U), key("I", KeyCode.I), key("O", KeyCode.O),
+                key("P", KeyCode.P));
+        
+        HBox row3 = new HBox(6);
+        row3.setAlignment(Pos.CENTER);
+        row3.getChildren().addAll(
+                key("A", KeyCode.A), key("S", KeyCode.S), key("D", KeyCode.D),
+                key("F", KeyCode.F), key("G", KeyCode.G), key("H", KeyCode.H),
+                key("J", KeyCode.J), key("K", KeyCode.K), key("L", KeyCode.L));
+        
+        HBox row4 = new HBox(6);
+        row4.setAlignment(Pos.CENTER);
+        row4.getChildren().addAll(
+                leftShift,
+                key("Z", KeyCode.Z), key("X", KeyCode.X), key("C", KeyCode.C),
+                key("V", KeyCode.V), key("B", KeyCode.B), key("N", KeyCode.N),
+                key("M", KeyCode.M), key(",", KeyCode.COMMA),
+                key(".", KeyCode.PERIOD),
+                rightShift);
+        
+        HBox row5 = new HBox(6);
+        row5.setAlignment(Pos.CENTER);
+        row5.getChildren().addAll(keyWide("Space", KeyCode.SPACE, 360));
+        
+        keyboard.getChildren().addAll(row1, row2, row3, row4, row5);
+        return keyboard;
+    }
+    
+    private Button key(String text, KeyCode code) {
+        return keyWide(text, code, 46);
+    }
+    
+    private Button keyWide(String text, KeyCode code, double width) {
+        Button button = makeButton(text, width);
+        keys.put(code, button);
+        return button;
+    }
+    
+    private Button makeButton(String text, double width) {
+        Button button = new Button(text);
+        button.setFocusTraversable(false);
+        button.setPrefSize(width, 46);
+        button.setMinSize(width, 46);
+        return button;
     }
 
 }
