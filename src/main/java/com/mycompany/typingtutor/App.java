@@ -41,6 +41,9 @@ public class App extends Application {
     private Button leftShift;
     private Button rightShift;
     
+    private Label correctLabel;
+    private Label incorrectLabel;
+    
     @Override
     public void start(Stage stage) {
         Label promptLabel = new Label("Text to type");
@@ -61,6 +64,11 @@ public class App extends Application {
         keyTextField.setPrefWidth(160);
         Label keyLabel = new Label("Key pressed:");
         
+        correctLabel = new Label();
+        correctLabel.getStyleClass().add("correct-label");
+        incorrectLabel = new Label();
+        incorrectLabel.getStyleClass().add("incorrect-label");
+        
         Button nextButton = new Button("Next");
         nextButton.setFocusTraversable(false);
         nextButton.setOnAction(e -> {
@@ -73,9 +81,13 @@ public class App extends Application {
             resetSession();
         });
         
+        inputTextField.textProperty().addListener((obs, oldText, newText) -> {
+            updateScore();
+        });
+        
         HBox hbox = new HBox(12);
         hbox.setAlignment(Pos.CENTER_LEFT);
-        hbox.getChildren().addAll(progressLabel, nextButton, resetButton, keyLabel, keyTextField);
+        hbox.getChildren().addAll(progressLabel, nextButton, resetButton, keyLabel, keyTextField, correctLabel, incorrectLabel);
         
         VBox topBox = new VBox(8);
         topBox.setPadding(new Insets(16));
@@ -95,12 +107,15 @@ public class App extends Application {
         scene.setOnKeyPressed(event -> {
             onKeyPressed(event);
         });
+        
         scene.setOnKeyReleased(event -> {
             onKeyReleased(event);
         });
+        
         inputTextField.setOnKeyPressed(event -> {
             onKeyPressed(event);
         });
+        
         inputTextField.setOnKeyReleased(event -> {
             onKeyReleased(event);
         });
@@ -137,6 +152,7 @@ public class App extends Application {
         inputTextField.clear();
         progressLabel.setText((currentIndex + 1) + " of " + sentences.length);
         showKeyValue("", false);
+        updateScore();
         inputTextField.requestFocus();
     }
     
@@ -273,5 +289,23 @@ public class App extends Application {
         if (notHandled) {
             keyTextField.getStyleClass().add("not-handled");
         }
-}
+    }
+    
+    private void updateScore() {
+        String target = sentences[currentIndex];
+        String typed = inputTextField.getText();
+        int good = 0;
+        int bad = 0;
+
+        for (int i = 0; i < typed.length(); i++) {
+            if (i < target.length() && typed.charAt(i) == target.charAt(i)) {
+                good++;
+            } else {
+                bad++;
+            }
+        }
+
+        correctLabel.setText("Correct: " + good);
+        incorrectLabel.setText("Incorrect: " + bad);
+    }
 }
