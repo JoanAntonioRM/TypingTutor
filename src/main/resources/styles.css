@@ -1,0 +1,14 @@
+.key {
+    -fx-font-weight: bold;
+}
+
+.key.pressed {
+    -fx-background-color: #2563eb;
+    -fx-text-fill: white;
+}
+
+.not-handled {
+    -fx-text-fill: red;
+    -fx-text-inner-color: red;
+    -fx-font-weight: bold;
+}
