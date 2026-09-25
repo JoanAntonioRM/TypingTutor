@@ -25,6 +25,7 @@ public class App extends Application {
     
     private int currentIndex = 0;
     private TextField promptTextField;
+    private TextField inputTextField;
     
     @Override
     public void start(Stage stage) {
@@ -34,13 +35,19 @@ public class App extends Application {
         promptTextField.setFocusTraversable(false);
         promptTextField.setText(sentences[currentIndex]);
         
-        VBox root = new VBox(8, promptLabel, promptTextField);
+        Label inputLabel = new Label("Your typed response");
+        inputTextField = new TextField();
+        inputTextField.setPromptText("Your typing appears here");
+        
+        VBox root = new VBox(8);
         root.setPadding(new Insets(16));
+        root.getChildren().addAll(promptLabel, promptTextField, inputLabel, inputTextField);
         
         Scene scene = new Scene(root, 1280, 720);
         stage.setTitle("Typing Tutor");
         stage.setScene(scene);
         stage.show();
+        inputTextField.requestFocus();
     }
 
     public static void main(String[] args) {
