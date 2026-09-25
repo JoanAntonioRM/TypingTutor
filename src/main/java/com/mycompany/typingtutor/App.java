@@ -157,14 +157,14 @@ public class App extends Application {
     }
     
     private VBox buildKeyboard() {
-        VBox keyboard = new VBox(6);
+        VBox keyboard = new VBox(10);
         keyboard.setAlignment(Pos.CENTER);
         keyboard.setPadding(new Insets(12));
         
-        leftShift = makeButton("Shift", 80);
-        rightShift = makeButton("Shift", 80);
+        leftShift = makeButton("Shift", 120);
+        rightShift = makeButton("Shift", 120);
         
-        HBox row1 = new HBox(6);
+        HBox row1 = new HBox(10);
         row1.setAlignment(Pos.CENTER);
         row1.getChildren().addAll(
                 key("1", KeyCode.DIGIT1), key("2", KeyCode.DIGIT2),
@@ -172,9 +172,9 @@ public class App extends Application {
                 key("5", KeyCode.DIGIT5), key("6", KeyCode.DIGIT6),
                 key("7", KeyCode.DIGIT7), key("8", KeyCode.DIGIT8),
                 key("9", KeyCode.DIGIT9), key("0", KeyCode.DIGIT0),
-                keyWide("Backspace", KeyCode.BACK_SPACE, 90));
+                keyWide("Backspace", KeyCode.BACK_SPACE, 140));
         
-        HBox row2 = new HBox(6);
+        HBox row2 = new HBox(10);
         row2.setAlignment(Pos.CENTER);
         row2.getChildren().addAll(
                 key("Q", KeyCode.Q), key("W", KeyCode.W), key("E", KeyCode.E),
@@ -182,14 +182,14 @@ public class App extends Application {
                 key("U", KeyCode.U), key("I", KeyCode.I), key("O", KeyCode.O),
                 key("P", KeyCode.P));
         
-        HBox row3 = new HBox(6);
+        HBox row3 = new HBox(10);
         row3.setAlignment(Pos.CENTER);
         row3.getChildren().addAll(
                 key("A", KeyCode.A), key("S", KeyCode.S), key("D", KeyCode.D),
                 key("F", KeyCode.F), key("G", KeyCode.G), key("H", KeyCode.H),
                 key("J", KeyCode.J), key("K", KeyCode.K), key("L", KeyCode.L));
         
-        HBox row4 = new HBox(6);
+        HBox row4 = new HBox(10);
         row4.setAlignment(Pos.CENTER);
         row4.getChildren().addAll(
                 leftShift,
@@ -199,16 +199,16 @@ public class App extends Application {
                 key(".", KeyCode.PERIOD),
                 rightShift);
         
-        HBox row5 = new HBox(6);
+        HBox row5 = new HBox(10);
         row5.setAlignment(Pos.CENTER);
-        row5.getChildren().addAll(keyWide("Space", KeyCode.SPACE, 360));
+        row5.getChildren().addAll(keyWide("Space", KeyCode.SPACE, 520));
         
         keyboard.getChildren().addAll(row1, row2, row3, row4, row5);
         return keyboard;
     }
     
     private Button key(String text, KeyCode code) {
-        return keyWide(text, code, 46);
+        return keyWide(text, code, 66);
     }
     
     private Button keyWide(String text, KeyCode code, double width) {
@@ -221,36 +221,41 @@ public class App extends Application {
         Button button = new Button(text);
         button.getStyleClass().add("key");
         button.setFocusTraversable(false);
-        button.setPrefSize(width, 46);
-        button.setMinSize(width, 46);
+        button.setPrefSize(width, 66);
+        button.setMinSize(width, 66);
         return button;
     }
     
     private void onKeyPressed(KeyEvent event) {
         KeyCode keyCode = event.getCode();
         String keyText = event.getText();
+        
         if (keyCode == KeyCode.SHIFT) {
             setPressed(leftShift, true);
             setPressed(rightShift, true);
             showKeyValue("Shift", false);
             return;
         }
+        
         Button key = keys.get(keyCode);
         if (key == null) {
             showKeyValue("Not handled", true);
             return;
         }
+        
         setPressed(key, true);
         showKeyValue(displayValue(keyCode, keyText), false);
     }
         
     private void onKeyReleased(KeyEvent event) {
         KeyCode keyCode = event.getCode();
+        
         if (keyCode == KeyCode.SHIFT) {
             setPressed(leftShift, false);
             setPressed(rightShift, false);
             return;
         }
+        
         Button key = keys.get(keyCode);
         if (key != null) {
             setPressed(key, false);
@@ -258,22 +263,28 @@ public class App extends Application {
     }
     
     private String displayValue(KeyCode keyCode, String keyText) {
+        
         if (keyCode == KeyCode.BACK_SPACE) {
             return "Backspace";
         }
+        
         if (keyCode == KeyCode.SPACE) {
             return "Space";
         }
+        
         if (keyText != null && !keyText.isEmpty() && Character.isLetter(keyText.charAt(0))) {
             return keyText.toUpperCase();
         }
+        
         if (keyText != null && !keyText.isEmpty()) {
             return keyText;
         }
+        
         return keyCode.getName();
     }
     
     private void setPressed(Button button, boolean pressed) {
+        
         if (pressed) {
             if (!button.getStyleClass().contains("pressed")) {
                 button.getStyleClass().add("pressed");
@@ -286,6 +297,7 @@ public class App extends Application {
     private void showKeyValue(String value, boolean notHandled) {
         keyTextField.setText(value);
         keyTextField.getStyleClass().remove("not-handled");
+        
         if (notHandled) {
             keyTextField.getStyleClass().add("not-handled");
         }
