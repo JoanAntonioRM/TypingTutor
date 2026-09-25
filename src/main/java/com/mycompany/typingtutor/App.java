@@ -2,7 +2,10 @@ package com.mycompany.typingtutor;
 
 
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -20,11 +23,22 @@ public class App extends Application {
         "A large fawn jumped quickly over the white zinc boxes."
     };
     
+    private int currentIndex = 0;
+    private TextField promptTextField;
+    
     @Override
     public void start(Stage stage) {
-        VBox root = new VBox();
+        Label promptLabel = new Label("Text to type");
+        promptTextField = new TextField();
+        promptTextField.setEditable(false);
+        promptTextField.setFocusTraversable(false);
+        promptTextField.setText(sentences[currentIndex]);
+        
+        VBox root = new VBox(8, promptLabel, promptTextField);
+        root.setPadding(new Insets(16));
         
         Scene scene = new Scene(root, 1280, 720);
+        stage.setTitle("Typing Tutor");
         stage.setScene(scene);
         stage.show();
     }
