@@ -11,6 +11,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -34,6 +35,7 @@ public class App extends Application {
     private TextField promptTextField;
     private TextField inputTextField;
     private Label progressLabel;
+    private TextField keyTextField;
     
     private final Map<KeyCode, Button> keys = new HashMap<>();
     private Button leftShift;
@@ -53,6 +55,12 @@ public class App extends Application {
         
         progressLabel = new Label();
         
+        keyTextField = new TextField();
+        keyTextField.setEditable(false);
+        keyTextField.setFocusTraversable(false);
+        keyTextField.setPrefWidth(160);
+        Label keyLabel = new Label("Key pressed:");
+        
         Button nextButton = new Button("Next");
         nextButton.setFocusTraversable(false);
         nextButton.setOnAction(e -> {
@@ -67,7 +75,7 @@ public class App extends Application {
         
         HBox hbox = new HBox(12);
         hbox.setAlignment(Pos.CENTER_LEFT);
-        hbox.getChildren().addAll(progressLabel, nextButton, resetButton);
+        hbox.getChildren().addAll(progressLabel, nextButton, resetButton, keyLabel, keyTextField);
         
         VBox topBox = new VBox(8);
         topBox.setPadding(new Insets(16));
@@ -82,6 +90,21 @@ public class App extends Application {
         loadCurrentPrompt();
         
         Scene scene = new Scene(rootNode, 1280, 720);
+        scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
+        
+        scene.setOnKeyPressed(event -> {
+            onKeyPressed(event);
+        });
+        scene.setOnKeyReleased(event -> {
+            onKeyReleased(event);
+        });
+        inputTextField.setOnKeyPressed(event -> {
+            onKeyPressed(event);
+        });
+        inputTextField.setOnKeyReleased(event -> {
+            onKeyReleased(event);
+        });
+        
         stage.setTitle("Typing Tutor");
         stage.setScene(scene);
         stage.show();
@@ -96,14 +119,24 @@ public class App extends Application {
         currentIndex = (currentIndex + 1) % sentences.length;
         loadCurrentPrompt();
     }
+    
     private void resetSession() {
         currentIndex = 0;
+        setPressed(leftShift, false);
+        setPressed(rightShift, false);
+        
+        for (Button key : keys.values()) {
+            setPressed(key, false);
+        }
+        
         loadCurrentPrompt();
     }
+    
     private void loadCurrentPrompt() {
         promptTextField.setText(sentences[currentIndex]);
         inputTextField.clear();
         progressLabel.setText((currentIndex + 1) + " of " + sentences.length);
+        showKeyValue("", false);
         inputTextField.requestFocus();
     }
     
@@ -170,10 +203,75 @@ public class App extends Application {
     
     private Button makeButton(String text, double width) {
         Button button = new Button(text);
+        button.getStyleClass().add("key");
         button.setFocusTraversable(false);
         button.setPrefSize(width, 46);
         button.setMinSize(width, 46);
         return button;
     }
-
+    
+    private void onKeyPressed(KeyEvent event) {
+        KeyCode keyCode = event.getCode();
+        String keyText = event.getText();
+        if (keyCode == KeyCode.SHIFT) {
+            setPressed(leftShift, true);
+            setPressed(rightShift, true);
+            showKeyValue("Shift", false);
+            return;
+        }
+        Button key = keys.get(keyCode);
+        if (key == null) {
+            showKeyValue("Not handled", true);
+            return;
+        }
+        setPressed(key, true);
+        showKeyValue(displayValue(keyCode, keyText), false);
+    }
+        
+    private void onKeyReleased(KeyEvent event) {
+        KeyCode keyCode = event.getCode();
+        if (keyCode == KeyCode.SHIFT) {
+            setPressed(leftShift, false);
+            setPressed(rightShift, false);
+            return;
+        }
+        Button key = keys.get(keyCode);
+        if (key != null) {
+            setPressed(key, false);
+        }
+    }
+    
+    private String displayValue(KeyCode keyCode, String keyText) {
+        if (keyCode == KeyCode.BACK_SPACE) {
+            return "Backspace";
+        }
+        if (keyCode == KeyCode.SPACE) {
+            return "Space";
+        }
+        if (keyText != null && !keyText.isEmpty() && Character.isLetter(keyText.charAt(0))) {
+            return keyText.toUpperCase();
+        }
+        if (keyText != null && !keyText.isEmpty()) {
+            return keyText;
+        }
+        return keyCode.getName();
+    }
+    
+    private void setPressed(Button button, boolean pressed) {
+        if (pressed) {
+            if (!button.getStyleClass().contains("pressed")) {
+                button.getStyleClass().add("pressed");
+            }
+        } else {
+            button.getStyleClass().remove("pressed");
+        }
+    }
+    
+    private void showKeyValue(String value, boolean notHandled) {
+        keyTextField.setText(value);
+        keyTextField.getStyleClass().remove("not-handled");
+        if (notHandled) {
+            keyTextField.getStyleClass().add("not-handled");
+        }
+}
 }
